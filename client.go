@@ -6,7 +6,10 @@ import (
 )
 
 func NewKafkaClient() *KafkaClient {
-	return new(KafkaClient)
+	return &KafkaClient{
+		cc: &consumerClient{},
+		pc: &producerClient{},
+	}
 }
 
 func (kc *KafkaClient) SetProducerConfig(cfg map[string]interface{}) *KafkaClient {
