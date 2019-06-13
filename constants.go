@@ -7,5 +7,5 @@ const (
 
 	schemaNotValidError = "schema %s with version %s is not valid with data %s"
 
-	defaultPolling = 200
+	defaultTimeout = -1
 )

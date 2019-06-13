@@ -57,7 +57,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 			err := fmt.Errorf(signalError, sig)
 			errHandler(nil, err)
 		default:
-			msg, err := c.c.ReadMessage(-1)
+			msg, err := c.c.ReadMessage(defaultTimeout)
 			if err != nil {
 				print(err)
 				return
