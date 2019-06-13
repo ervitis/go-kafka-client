@@ -30,4 +30,12 @@ type (
 		Version string
 		Value   string
 	}
+
+	ConsumerConditions struct {
+		Key   string
+		Value string
+	}
+
+	ConsumerHandler func(msg []byte)
+	ConsumerErrorHandler func(msg []byte, err error)
 )

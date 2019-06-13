@@ -1,8 +1,8 @@
 package go_kafka_client
 
 import (
+	"encoding/json"
 	"fmt"
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"os"
 	"os/signal"
 	"syscall"
@@ -36,48 +36,68 @@ func (c *consumerClient) dataIsValidFromSchema(ev []byte, sch schema) bool {
 	}
 }
 
-func (c *consumerClient) Consume(topic string) error {
+func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandler ConsumerErrorHandler, conditions []ConsumerConditions) {
 	if topic == "" {
-		return fmt.Errorf(topicError, "consumer", "no topics to subscribe")
+		err := fmt.Errorf(topicError, "consumer", "no topics to subscribe")
+		errHandler(nil, err)
+		return
 	}
 
 	if err := c.c.Subscribe(topic, nil); err != nil {
-		return err
+		errHandler(nil, err)
+		return
 	}
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	done := false
-	var err error
-
-	for !done {
+	for true {
 		select {
 		case sig := <-sigchan:
-			err = fmt.Errorf(signalError, sig)
-			done = true
+			err := fmt.Errorf(signalError, sig)
+			errHandler(nil, err)
 		default:
-			ev := c.c.Poll(c.pollTimeout)
+			msg, err := c.c.ReadMessage(-1)
+			if err != nil {
+				print(err)
+				return
+			}
 
-			if ev == nil {
+			if c.validateOnConsume {
+				if !c.dataIsValidFromSchema(msg.Value, c.schemas[topic]) {
+					err := fmt.Errorf(schemaNotValidError, c.schemas[topic].Value, c.schemas[topic].Version, string(msg.Value))
+					errHandler(msg.Value, err)
+					return
+				}
+			}
+
+			c.filterEvent(msg.Value, handler, conditions)
+		}
+	}
+}
+
+func (c *consumerClient) filterEvent(msg []byte, handler ConsumerHandler, conditions []ConsumerConditions) {
+	var data map[string]interface{}
+	_ = json.Unmarshal(msg, data)
+
+	n := len(conditions)
+	count := 0
+
+	if n == 0 {
+		handler(msg)
+	} else {
+		for _, condition := range conditions {
+			if _, ok := data[condition.Key]; !ok {
 				continue
 			}
 
-			switch e := ev.(type) {
-			case *kafka.Message:
-				if c.validateOnConsume {
-					if !c.dataIsValidFromSchema(e.Value, c.schemas[topic]) {
-						return fmt.Errorf(schemaNotValidError, c.schemas[topic].Value, c.schemas[topic].Version, string(e.Value))
-					}
-				}
-			case *kafka.Error:
-				if e.IsFatal() {
-					err = e
-					done = true
-				}
+			if data[condition.Key] == condition.Value {
+				count++
 			}
 		}
-	}
 
-	return err
+		if n == count {
+			handler(msg)
+		}
+	}
 }
