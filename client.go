@@ -45,38 +45,34 @@ func (kc *KafkaClient) SetConsumerConfig(cfg map[string]interface{}) *KafkaClien
 }
 
 func (kc *KafkaClient) SetTimeoutPolling(polling int) *KafkaClient {
-	kc.cc.pollTimeoutSeconds = polling
+	if polling < defaultTimeout {
+		kc.cc.pollTimeoutSeconds = defaultTimeout
+	} else {
+		kc.cc.pollTimeoutSeconds = polling
+	}
 
 	return kc
 }
 
-func (kc *KafkaClient) SetProducerTopicConfig(topicName string, partitionType int32) (*KafkaClient, error) {
-	if topicName == "" {
-		return nil, fmt.Errorf(topicError, "producer", "topic name is empty")
-	}
-
+func (kc *KafkaClient) SetProducerTopicConfig(topicName string, partitionType int32) *KafkaClient {
 	if kc.pc.t == nil {
 		kc.pc.t = &kafka.TopicPartition{Topic: &topicName, Partition: partitionType}
 	}
 
-	return kc, nil
-}
-
-func (kc *KafkaClient) SetConsumerTopicConfig(topicName string, partitionType int32) (*KafkaClient, error) {
-	if topicName == "" {
-		return nil, fmt.Errorf(topicError, "producer", "topic name is empty")
-	}
-
-	if kc.pc.t == nil {
-		kc.pc.t = &kafka.TopicPartition{Topic: &topicName, Partition: partitionType}
-	}
-
-	return kc, nil
+	return kc
 }
 
 func (kc *KafkaClient) BuildProducer() (*producerClient, error) {
 	if kc.pc == nil || kc.pc.config == nil {
 		return nil, fmt.Errorf(noConfigError, "producer")
+	}
+
+	if kc.pc.t == nil {
+		return nil, fmt.Errorf(noConfigError, "producer for partition configuration")
+	}
+
+	if kc.pc.t.Topic == nil || *kc.pc.t.Topic == "" {
+		return nil, fmt.Errorf(topicError, "producer", "topic name is empty")
 	}
 
 	var err error
