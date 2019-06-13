@@ -2,7 +2,7 @@ package go_kafka_client
 
 import "testing"
 
-func producerConfig() map[string]interface{} {
+func exampleConfiguration() map[string]interface{} {
 	return map[string]interface{}{
 		"auto.commit": true,
 		"poll.intervall.ms": 2000,
@@ -25,7 +25,7 @@ func TestNewKafkaClient_NilProperties(t *testing.T) {
 func TestKafkaClient_SetProducerConfig(t *testing.T) {
 	client := NewKafkaClient()
 
-	client.SetProducerConfig(producerConfig())
+	client.SetProducerConfig(exampleConfiguration())
 
 	if len(client.pc.config) == 0 {
 		t.Error("config not set correctly")
@@ -48,6 +48,36 @@ func TestKafkaClient_SetProducerConfig_Empty(t *testing.T) {
 	client.SetProducerConfig(map[string]interface{}{})
 
 	if len(client.pc.config) != 0 {
+		t.Error("parameter config empty but the config has content")
+	}
+}
+
+func TestKafkaClient_SetConsumerConfig(t *testing.T) {
+	client := NewKafkaClient()
+
+	client.SetConsumerConfig(exampleConfiguration())
+
+	if len(client.cc.config) == 0 {
+		t.Error("config not set correctly")
+	}
+}
+
+func TestKafkaClient_SetConsumerConfig_Nil(t *testing.T) {
+	client := NewKafkaClient()
+
+	client.SetConsumerConfig(nil)
+
+	if client.cc.config != nil {
+		t.Error("parameter config not set but the config has content")
+	}
+}
+
+func TestKafkaClient_SetConsumerConfig_Empty(t *testing.T) {
+	client := NewKafkaClient()
+
+	client.SetConsumerConfig(map[string]interface{}{})
+
+	if len(client.cc.config) != 0 {
 		t.Error("parameter config empty but the config has content")
 	}
 }
