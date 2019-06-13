@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func (c *consumerClient) ActivateValidator() *consumerClient {
@@ -57,7 +58,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 			err := fmt.Errorf(signalError, sig)
 			errHandler(nil, err)
 		default:
-			msg, err := c.c.ReadMessage(defaultTimeout)
+			msg, err := c.c.ReadMessage(time.Duration(c.pollTimeoutSeconds)*time.Second)
 			if err != nil {
 				print(err)
 				return

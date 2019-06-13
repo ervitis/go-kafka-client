@@ -13,12 +13,12 @@ type (
 	}
 
 	consumerClient struct {
-		config            kafka.ConfigMap
-		c                 *kafka.Consumer
-		pollTimeout       int
-		validateOnConsume bool
-		validator         Validator
-		schemas           map[string]schema
+		config             kafka.ConfigMap
+		c                  *kafka.Consumer
+		pollTimeoutSeconds int
+		validateOnConsume  bool
+		validator          Validator
+		schemas            map[string]schema
 	}
 
 	KafkaClient struct {

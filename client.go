@@ -42,7 +42,7 @@ func (kc *KafkaClient) SetConsumerConfig(cfg map[string]interface{}) *KafkaClien
 }
 
 func (kc *KafkaClient) SetTimeoutPolling(polling int) *KafkaClient {
-	kc.cc.pollTimeout = polling
+	kc.cc.pollTimeoutSeconds = polling
 
 	return kc
 }
@@ -90,8 +90,8 @@ func (kc *KafkaClient) BuildConsumer() (*consumerClient, error) {
 		return nil, fmt.Errorf(noConfigError, "consumer")
 	}
 
-	if kc.cc.pollTimeout == 0 {
-		kc.cc.pollTimeout = defaultPolling
+	if kc.cc.pollTimeoutSeconds == 0 {
+		kc.cc.pollTimeoutSeconds = defaultTimeout
 	}
 
 	var err error
