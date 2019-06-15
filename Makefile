@@ -1,4 +1,5 @@
 test:
+	bash dependencies.sh
 	go test -v -race ./...
 
 lint:
@@ -8,6 +9,7 @@ lint:
 check: lint test
 
 cover:
+	bash dependencies.sh
 	go test -race -cover -coverprofile=cover.out ./...
 	go tool cover -html=cover.out
 	cat cover.out >> coverage.txt
