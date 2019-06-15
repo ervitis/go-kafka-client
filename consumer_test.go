@@ -1,27 +1,8 @@
 package go_kafka_client
 
 import (
-	"errors"
 	"testing"
 )
-
-type mockValidator struct{}
-
-func (m *mockValidator) ValidateData(msg []byte, schema schema) (bool, error) {
-	if schema.Value == "notvalid" {
-		return false, nil
-	} else if schema.Value == "error" {
-		return false, errors.New("ups")
-	}
-	return true, nil
-}
-
-func (m *mockValidator) IsReachable(schema schema) bool {
-	if schema.Value == "notreachable" {
-		return false
-	}
-	return true
-}
 
 func TestConsumerClient_ActivateValidator(t *testing.T) {
 	c := consumerClient{}
