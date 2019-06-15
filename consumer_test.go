@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-type mockValidator struct {}
+type mockValidator struct{}
 
 func (m *mockValidator) ValidateData(msg []byte, schema schema) (bool, error) {
 	if schema.Value == "notvalid" {
