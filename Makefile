@@ -10,4 +10,4 @@ check: lint test
 cover:
 	go test -race -cover -coverprofile=cover.out ./...
 	go tool cover -html=cover.out
-    cat cover.out >> coverage.txt
+	cat cover.out >> coverage.txt
