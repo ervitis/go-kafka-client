@@ -14,7 +14,7 @@ go get github.com/ervitis/go-kafka-client
 
 This library is using confluent kafka go client version 1.0.0 and librdkafka 1.0.1 version
 
-```
+```bash
 git clone -b v1.0.1 https://github.com/edenhill/librdkafka
 
 ./configure
@@ -24,7 +24,9 @@ sudo make install
 
 ## Running the tests
 
+```bash
 go test -race -v ./...
+```
 
 ## Built With
 
