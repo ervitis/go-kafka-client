@@ -20,6 +20,9 @@ func (c *consumerClient) DeactivateValidator() *consumerClient {
 }
 
 func (c *consumerClient) SetSchema(topic, schemaName, version string) *consumerClient {
+	if c.schemas == nil {
+		c.schemas = make(map[string]schema)
+	}
 	c.schemas[topic] = schema{Value: schemaName, Version: version}
 	return c
 }
@@ -79,7 +82,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 
 func (c *consumerClient) filterEvent(msg []byte, handler ConsumerHandler, conditions []ConsumerConditions) {
 	var data map[string]interface{}
-	_ = json.Unmarshal(msg, data)
+	_ = json.Unmarshal(msg, &data)
 
 	n := len(conditions)
 	count := 0
