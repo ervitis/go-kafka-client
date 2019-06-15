@@ -16,6 +16,9 @@ func (p *producerClient) DeactivateValidator() *producerClient {
 }
 
 func (p *producerClient) SetSchema(topic, schemaName, version string) *producerClient {
+	if p.schemas == nil {
+		p.schemas = make(map[string]schema)
+	}
 	p.schemas[topic] = schema{Value: schemaName, Version: version}
 	return p
 }
