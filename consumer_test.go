@@ -1,6 +1,7 @@
 package go_kafka_client
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -9,6 +10,8 @@ type mockValidator struct {}
 func (m *mockValidator) ValidateData(msg []byte, schema schema) (bool, error) {
 	if schema.Value == "notvalid" {
 		return false, nil
+	} else if schema.Value == "error" {
+		return false, errors.New("ups")
 	}
 	return true, nil
 }
@@ -64,6 +67,26 @@ func TestConsumerClient_DataIsValidFromSchema(t *testing.T) {
 	}
 }
 
+func TestConsumerClient_DataIsValidFromSchema_NotRechable(t *testing.T) {
+	c := consumerClient{
+		validator: &mockValidator{},
+	}
+
+	if c.dataIsValidFromSchema([]byte(``), schema{Value: "notreachable", Version: "1.0.0"}) {
+		t.Error("not valid when it is not reachable")
+	}
+}
+
+func TestConsumerClient_DataIsValidFromSchema_Error(t *testing.T) {
+	c := consumerClient{
+		validator: &mockValidator{},
+	}
+
+	if c.dataIsValidFromSchema([]byte(``), schema{Value: "error", Version: "1.0.0"}) {
+		t.Error("on error it returned valid schema")
+	}
+}
+
 func TestConsumerClient_DataIsValidFromSchema_NotValid(t *testing.T) {
 	c := consumerClient{
 		validator: &mockValidator{},
@@ -95,6 +118,9 @@ func TestConsumerClient_filterEvent(t *testing.T) {
 			{Value: "2.0.0", Key: "VERSION"},
 			{Value: "create-user", Key: "EventName"},
 		},
+		{
+			{Value: "1.0.0", Key: "VERSIO"},
+		},
 	}
 
 	c.filterEvent([]byte(`{"VERSION": "1.0.0", "EventName": "create-user", "Date": "2018-12-04"}`), handler, conditions[0])
@@ -123,6 +149,11 @@ func TestConsumerClient_filterEvent(t *testing.T) {
 	}
 
 	c.filterEvent([]byte(`{"VERSION": "1.0.0", "EventName": "update-user", "Date": "2018-12-04"}`), handler, []ConsumerConditions{})
+	if count != 5 {
+		t.Error("count != 5")
+	}
+
+	c.filterEvent([]byte(`{"VERSION": "1.0.0", "EventName": "update-user", "Date": "2018-12-04"}`), handler, conditions[3])
 	if count != 5 {
 		t.Error("count != 5")
 	}
