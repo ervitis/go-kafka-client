@@ -3,6 +3,7 @@ test:
 	go test -v -race ./...
 
 lint:
+	bash dependencies.sh
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	golangci-lint run
 
