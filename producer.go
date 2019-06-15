@@ -29,7 +29,7 @@ func (p *producerClient) dataIsValidFromSchema(ev []byte, schema schema) bool {
 	}
 
 	if isValid, err := p.validator.ValidateData(ev, schema); err != nil {
-		panic(err)
+		print(err)
 	} else {
 		return isValid
 	}
