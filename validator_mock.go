@@ -14,5 +14,5 @@ func (m *mockValidator) ValidateData(msg []byte, schema schema) (bool, error) {
 }
 
 func (m *mockValidator) IsReachable(schema schema) bool {
-	return schema.Value == "notreachable"
+	return schema.Value != "notreachable"
 }
