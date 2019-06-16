@@ -55,7 +55,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	for true {
+	for {
 		select {
 		case sig := <-sigchan:
 			err := fmt.Errorf(signalError, sig)

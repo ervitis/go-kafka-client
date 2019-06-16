@@ -17,6 +17,7 @@ notifications:
   email: false
 
 script:
+  - apt-get install pkg-config
   - bash dependencies.sh
   - find / -name pkconfig
   - make check
