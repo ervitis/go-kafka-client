@@ -1,0 +1,30 @@
+version: "3.5"
+services:
+
+  kafka:
+    image: landoop/fast-data-dev:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "2181:2181"
+      - "3030:3030"
+    domainname: localhost
+    hostname: localhost
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - SAMPLEDATA=0
+      - RUNNING_SAMPLEDATA=0
+      - RUNTESTS=0
+      - ENABLE_SSL=0
+      - DEBUG=1
+      - SUPERVISORWEB=0
+      - TOPIC_DELETE=1

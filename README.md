@@ -10,7 +10,21 @@ You can get the library using `go get`
 go get github.com/ervitis/go-kafka-client
 ```
 
-For an example how to use this library, see inside the folder `examples`
+For an example how to use this library, see inside the folder `examples`.
+
+We can try it if you run the following commands:
+
+```bash
+go run examples/simple_consumer/main.go
+```
+
+Open another terminal and type:
+
+```bash
+go run examples/simple_producer/main.go
+```
+
+To stop the consumer send a kill signal to the process
 
 ### API
 
