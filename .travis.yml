@@ -19,7 +19,6 @@ notifications:
 script:
   - sudo apt-get install -y pkg-config
   - bash dependencies.sh
-  - sudo find / -name pkg-config
   - make check
   - make cover
 
