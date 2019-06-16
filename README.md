@@ -2,6 +2,10 @@
 
 Kafka Golang library using confluent golang library and librdkafka
 
+[![Build Status](https://travis-ci.org/ervitis/go-kafka-client.svg?branch=master)](https://travis-ci.org/ervitis/go-kafka-client) 
+[![codecov](https://codecov.io/gh/ervitis/go-kafka-client/branch/master/graph/badge.svg)](https://codecov.io/gh/ervitis/go-kafka-client) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ervitis/go-kafka-client)](https://goreportcard.com/report/github.com/ervitis/go-kafka-client)
+
 ## Getting Started
 
 You can get the library using `go get`
