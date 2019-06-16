@@ -1,4 +1,4 @@
-package go_kafka_client
+package gokafkaclient
 
 import "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 
@@ -21,6 +21,9 @@ type (
 		schemas            map[string]schema
 	}
 
+	/**
+	Kafka client
+	 */
 	KafkaClient struct {
 		pc *producerClient
 		cc *consumerClient
@@ -31,11 +34,28 @@ type (
 		Value   string
 	}
 
+	/**
+	Consumer filter conditions
+	 */
 	ConsumerConditions struct {
 		Key   string
 		Value string
 	}
 
-	ConsumerHandler      func(msg []byte)
+	/**
+	Consumer handler type of function
+	 */
+	ConsumerHandler func(msg []byte)
+	/**
+	Consumer error handler
+	 */
 	ConsumerErrorHandler func(msg []byte, err error)
+
+	/**
+	Producer header
+	 */
+	ProducerHeader struct {
+		Key   string
+		Value string
+	}
 )

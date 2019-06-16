@@ -1,4 +1,4 @@
-package go_kafka_client
+package gokafkaclient
 
 type (
 	Validator interface {

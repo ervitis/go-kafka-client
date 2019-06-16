@@ -1,10 +1,13 @@
-package go_kafka_client
+package gokafkaclient
 
 import (
 	"fmt"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
+/**
+Constructor of the kafka client
+ */
 func NewKafkaClient() *KafkaClient {
 	return &KafkaClient{
 		cc: &consumerClient{},
@@ -12,6 +15,9 @@ func NewKafkaClient() *KafkaClient {
 	}
 }
 
+/**
+Producer config setter
+ */
 func (kc *KafkaClient) SetProducerConfig(cfg map[string]interface{}) *KafkaClient {
 	if cfg == nil {
 		return kc
@@ -28,6 +34,9 @@ func (kc *KafkaClient) SetProducerConfig(cfg map[string]interface{}) *KafkaClien
 	return kc
 }
 
+/**
+Consumer config setter
+ */
 func (kc *KafkaClient) SetConsumerConfig(cfg map[string]interface{}) *KafkaClient {
 	if cfg == nil {
 		return kc
@@ -44,6 +53,9 @@ func (kc *KafkaClient) SetConsumerConfig(cfg map[string]interface{}) *KafkaClien
 	return kc
 }
 
+/**
+Timeout polling setter for the consumer when reading messages from kafka
+ */
 func (kc *KafkaClient) SetTimeoutPolling(polling int) *KafkaClient {
 	if polling < defaultTimeout {
 		kc.cc.pollTimeoutSeconds = defaultTimeout
@@ -54,6 +66,10 @@ func (kc *KafkaClient) SetTimeoutPolling(polling int) *KafkaClient {
 	return kc
 }
 
+/**
+Topic configuration setter for the producer. It sets what partition should be write the message into the topic
+passed as parameter
+ */
 func (kc *KafkaClient) SetProducerTopicConfig(topicName string, partitionType int32) *KafkaClient {
 	if kc.pc.t == nil {
 		kc.pc.t = &kafka.TopicPartition{Topic: &topicName, Partition: partitionType}
@@ -62,6 +78,9 @@ func (kc *KafkaClient) SetProducerTopicConfig(topicName string, partitionType in
 	return kc
 }
 
+/**
+Producer builder
+ */
 func (kc *KafkaClient) BuildProducer() (*producerClient, error) {
 	if kc.pc == nil || kc.pc.config == nil {
 		return nil, fmt.Errorf(noConfigError, "producer")
@@ -84,6 +103,9 @@ func (kc *KafkaClient) BuildProducer() (*producerClient, error) {
 	return kc.pc, nil
 }
 
+/**
+Consumer builder
+ */
 func (kc *KafkaClient) BuildConsumer() (*consumerClient, error) {
 	if kc.cc == nil || kc.cc.config == nil {
 		return nil, fmt.Errorf(noConfigError, "consumer")
