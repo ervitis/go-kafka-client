@@ -61,7 +61,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 			err := fmt.Errorf(signalError, sig)
 			errHandler(nil, err)
 		default:
-			msg, err := c.c.ReadMessage(time.Duration(c.pollTimeoutSeconds)*time.Second)
+			msg, err := c.c.ReadMessage(time.Duration(c.pollTimeoutSeconds) * time.Second)
 			if err != nil {
 				errHandler(nil, err)
 				return

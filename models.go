@@ -36,6 +36,6 @@ type (
 		Value string
 	}
 
-	ConsumerHandler func(msg []byte)
+	ConsumerHandler      func(msg []byte)
 	ConsumerErrorHandler func(msg []byte, err error)
 )
