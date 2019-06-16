@@ -10,6 +10,8 @@ You can get the library using `go get`
 go get github.com/ervitis/go-kafka-client
 ```
 
+In this repository there is a `docker-compose.yml` repository where we can try the library using a docker image from `landoop`
+
 For an example how to use this library, see inside the folder `examples`.
 
 We can try it if you run the following commands:
