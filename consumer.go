@@ -53,7 +53,7 @@ func (c *consumerClient) dataIsValidFromSchema(ev []byte, sch schema) bool {
 Consumer for the messages of the topic. When a message is read it will be filtered by the conditions and then the
 handler will be called
  */
-func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandler ConsumerErrorHandler, conditions []ConsumerConditions) {
+func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandler ConsumerErrorHandler, conditions ...ConsumerConditions) {
 	if topic == "" {
 		err := fmt.Errorf(topicError, "consumer", "no topics to subscribe")
 		errHandler(nil, err)
