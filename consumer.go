@@ -3,6 +3,7 @@ package gokafkaclient
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"os"
 	"os/signal"
 	"syscall"
@@ -60,7 +61,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 		return
 	}
 
-	if err := c.c.Subscribe(topic, nil); err != nil {
+	if err := c.kc.Subscribe(topic, nil); err != nil {
 		errHandler(nil, err)
 		return
 	}
@@ -74,7 +75,7 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 			err := fmt.Errorf(signalError, sig)
 			errHandler(nil, err)
 		default:
-			msg, err := c.c.ReadMessage(time.Duration(c.pollTimeoutSeconds) * time.Second)
+			msg, err := c.c.receive(time.Duration(c.pollTimeoutSeconds) * time.Second)
 			if err != nil {
 				errHandler(nil, err)
 				return
@@ -91,6 +92,10 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 			c.filterEvent(msg.Value, handler, conditions)
 		}
 	}
+}
+
+func (c *consumerClient) receive(t time.Duration) (*kafka.Message, error) {
+	return c.kc.ReadMessage(t)
 }
 
 func (c *consumerClient) filterEvent(msg []byte, handler ConsumerHandler, conditions []ConsumerConditions) {

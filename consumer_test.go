@@ -1,8 +1,18 @@
 package gokafkaclient
 
 import (
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"testing"
+	"time"
 )
+
+type (
+	mockConsumer struct{}
+)
+
+func (m *mockConsumer) receive(t time.Duration) (*kafka.Message, error) {
+	return &kafka.Message{Value: []byte(`hello`)}, nil
+}
 
 func TestConsumerClient_ActivateValidator(t *testing.T) {
 	c := consumerClient{}
@@ -137,5 +147,27 @@ func TestConsumerClient_filterEvent(t *testing.T) {
 	c.filterEvent([]byte(`{"VERSION": "1.0.0", "EventName": "update-user", "Date": "2018-12-04"}`), handler, conditions[3])
 	if count != 5 {
 		t.Error("count != 5")
+	}
+}
+
+func TestConsumerClient_Consume_Errors(t *testing.T) {
+	c := consumerClient{
+		validator: &mockValidator{},
+		c:         &mockConsumer{},
+		kc:        &kafka.Consumer{},
+	}
+
+	hasError := false
+
+	handler := func(msg []byte) {}
+
+	errorHandler := func(msg []byte, err error) {
+		hasError = true
+	}
+
+	c.Consume("", handler, errorHandler)
+
+	if !hasError {
+		t.Error("there should be an error because topic was empty on consumer")
 	}
 }
