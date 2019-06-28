@@ -12,7 +12,7 @@ type (
 )
 
 func (jv *JsonValidator) ValidateData(msg []byte, schema schema) (bool, error) {
-	loader := gojsonschema.NewReferenceLoader(fmt.Sprintf("%s.%s", schema.Value, schema.Version))
+	loader := gojsonschema.NewReferenceLoader(fmt.Sprintf("%s.%s.json", schema.Value, schema.Version))
 	doc := gojsonschema.NewStringLoader(string(msg))
 
 	v, err := gojsonschema.Validate(loader, doc)
@@ -20,12 +20,17 @@ func (jv *JsonValidator) ValidateData(msg []byte, schema schema) (bool, error) {
 		return false, err
 	}
 
-	var schErrors string
+	var schError error
+	var s string
 	for _, e := range v.Errors() {
-		schErrors += fmt.Sprintf("%s; ", e.String())
+		s += fmt.Sprintf("%s; ", e.String())
 	}
 
-	return v.Valid(), fmt.Errorf(schErrors)
+	if s != "" {
+		schError = fmt.Errorf(s)
+	}
+
+	return v.Valid(), schError
 }
 
 func (jv *JsonValidator) IsReachable(schema schema) bool {
