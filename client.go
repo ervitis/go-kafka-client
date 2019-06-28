@@ -96,7 +96,7 @@ func (kc *KafkaClient) BuildProducer() (*producerClient, error) {
 
 	var err error
 
-	if kc.pc.p, err = kafka.NewProducer(&kc.pc.config); err != nil {
+	if kc.pc.kp, err = kafka.NewProducer(&kc.pc.config); err != nil {
 		return nil, err
 	}
 

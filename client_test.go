@@ -131,7 +131,7 @@ func TestKafkaClient_BuildProducer(t *testing.T) {
 		t.Error(err)
 	}
 
-	if producer.p == nil {
+	if producer.kp == nil {
 		t.Error("producer built nil")
 	}
 }

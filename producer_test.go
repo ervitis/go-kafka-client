@@ -1,6 +1,35 @@
 package gokafkaclient
 
-import "testing"
+import (
+	"errors"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"testing"
+)
+
+type (
+	mockProducer struct{}
+
+	mockBadProducer struct{}
+
+	mockTopicProducerError struct{}
+)
+
+func (m *mockProducer) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+	mevent := &kafka.Message{}
+	return mevent, nil
+}
+
+func (m *mockBadProducer) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+	mevent := &kafka.Message{}
+	return mevent, errors.New("ups")
+}
+
+func (m *mockTopicProducerError) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+	mevent := &kafka.Message{
+		TopicPartition: kafka.TopicPartition{Error: errors.New("ups")},
+	}
+	return mevent, nil
+}
 
 func TestProducerClient_ActivateValidator(t *testing.T) {
 	c := producerClient{}
@@ -73,5 +102,94 @@ func TestProducerClient_DataIsValidFromSchema_NotValid(t *testing.T) {
 
 	if c.dataIsValidFromSchema([]byte(``), schema{Value: "notvalid", Version: "1.0.0"}) {
 		t.Error("schema is valid but it is not")
+	}
+}
+
+func TestProducerClient_Produce(t *testing.T) {
+	topic := "test-producer"
+
+	c := producerClient{
+		validator: &mockValidator{},
+		p:         &mockProducer{},
+		t:         &kafka.TopicPartition{Topic: &topic, Partition: PartitionAny},
+	}
+
+	if err := c.Produce([]byte(`hello`)); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestProducerClient_Produce_TopicError(t *testing.T) {
+	c := producerClient{
+		validator: &mockValidator{},
+		p:         &mockProducer{},
+		t:         nil,
+	}
+
+	if err := c.Produce([]byte(`hello`)); err == nil {
+		t.Error("there should be an error if topic is nil")
+	}
+}
+
+func TestProducerClient_Produce_WithHeaders(t *testing.T) {
+	topic := "test-producer"
+
+	c := producerClient{
+		validator: &mockValidator{},
+		p:         &mockProducer{},
+		t:         &kafka.TopicPartition{Topic: &topic, Partition: PartitionAny},
+	}
+
+	headers := []ProducerHeader{
+		{
+			Key:   "header1",
+			Value: "valueheader1",
+		},
+	}
+
+	if err := c.Produce([]byte(`hello`), headers...); err != nil {
+		t.Error("there was an error using headers")
+	}
+}
+
+func TestProducerClient_Produce_ErrorOnTopicPartition(t *testing.T) {
+	topic := "test-producer"
+
+	c := producerClient{
+		validator: &mockValidator{},
+		p:         &mockTopicProducerError{},
+		t:         &kafka.TopicPartition{Topic: &topic, Partition: PartitionAny},
+	}
+
+	headers := []ProducerHeader{
+		{
+			Key:   "header1",
+			Value: "valueheader1",
+		},
+	}
+
+	if err := c.Produce([]byte(`hello`), headers...); err == nil {
+		t.Error("there should be an error producing")
+	}
+}
+
+func TestProducerClient_Produce_ErrorProducer(t *testing.T) {
+	topic := "test-producer"
+
+	c := producerClient{
+		validator: &mockValidator{},
+		p:         &mockBadProducer{},
+		t:         &kafka.TopicPartition{Topic: &topic, Partition: PartitionAny},
+	}
+
+	headers := []ProducerHeader{
+		{
+			Key:   "header1",
+			Value: "valueheader1",
+		},
+	}
+
+	if err := c.Produce([]byte(`hello`), headers...); err == nil {
+		t.Error("there should be an error producing")
 	}
 }

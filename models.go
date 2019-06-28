@@ -3,9 +3,18 @@ package gokafkaclient
 import "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 
 type (
+	kafkaProducer interface {
+		send(ev []byte, headers ...kafka.Header) (kafka.Event, error)
+	}
+
+	kafkaConsumer interface {
+		receive() error
+	}
+
 	producerClient struct {
 		config            kafka.ConfigMap
-		p                 *kafka.Producer
+		p                 kafkaProducer
+		kp                *kafka.Producer
 		t                 *kafka.TopicPartition
 		validateOnProduce bool
 		validator         Validator
@@ -23,7 +32,7 @@ type (
 
 	/**
 	Kafka client
-	 */
+	*/
 	KafkaClient struct {
 		pc *producerClient
 		cc *consumerClient
@@ -36,7 +45,7 @@ type (
 
 	/**
 	Consumer filter conditions
-	 */
+	*/
 	ConsumerConditions struct {
 		Key   string
 		Value string
@@ -44,16 +53,16 @@ type (
 
 	/**
 	Consumer handler type of function
-	 */
+	*/
 	ConsumerHandler func(msg []byte)
 	/**
 	Consumer error handler
-	 */
+	*/
 	ConsumerErrorHandler func(msg []byte, err error)
 
 	/**
 	Producer header
-	 */
+	*/
 	ProducerHeader struct {
 		Key   string
 		Value string

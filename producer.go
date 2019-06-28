@@ -54,25 +54,33 @@ func (p *producerClient) Produce(ev []byte, headers ...ProducerHeader) error {
 		return fmt.Errorf(topicError, "producer", "topic config is empty")
 	}
 
-	devent := make(chan kafka.Event)
-
 	var hs []kafka.Header
 	for _, header := range headers {
 		h := kafka.Header{Key: header.Key, Value: []byte(header.Value)}
 		hs = append(hs, h)
 	}
 
-	defer close(devent)
-
-	if err := p.p.Produce(&kafka.Message{Headers: hs, TopicPartition: *p.t, Value: ev}, devent); err != nil {
+	event, err := p.p.send(ev, hs...)
+	if err != nil {
 		return err
 	}
-
-	event := <-devent
 
 	msg := event.(*kafka.Message)
 	if err := msg.TopicPartition.Error; err != nil {
 		return err
 	}
 	return nil
+}
+
+func (p *producerClient) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+	devent := make(chan kafka.Event)
+
+	defer close(devent)
+
+	if err := p.kp.Produce(&kafka.Message{Headers: headers, TopicPartition: *p.t, Value: ev}, devent); err != nil {
+		return nil, err
+	}
+
+	event := <-devent
+	return event, nil
 }
