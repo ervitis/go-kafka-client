@@ -117,7 +117,7 @@ func (kc *KafkaClient) BuildConsumer() (*consumerClient, error) {
 
 	var err error
 
-	if kc.cc.c, err = kafka.NewConsumer(&kc.cc.config); err != nil {
+	if kc.cc.kc, err = kafka.NewConsumer(&kc.cc.config); err != nil {
 		return nil, err
 	}
 

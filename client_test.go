@@ -174,7 +174,7 @@ func TestKafkaClient_BuildConsumer(t *testing.T) {
 		t.Error(err)
 	}
 
-	if consumer.c == nil {
+	if consumer.kc == nil {
 		t.Error("consumer built nil")
 	}
 }

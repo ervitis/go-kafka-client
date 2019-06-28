@@ -1,6 +1,9 @@
 package gokafkaclient
 
-import "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+import (
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"time"
+)
 
 type (
 	kafkaProducer interface {
@@ -8,7 +11,7 @@ type (
 	}
 
 	kafkaConsumer interface {
-		receive() error
+		receive(t time.Duration) (*kafka.Message, error)
 	}
 
 	producerClient struct {
@@ -23,7 +26,8 @@ type (
 
 	consumerClient struct {
 		config             kafka.ConfigMap
-		c                  *kafka.Consumer
+		c                  kafkaConsumer
+		kc                 *kafka.Consumer
 		pollTimeoutSeconds int
 		validateOnConsume  bool
 		validator          Validator
