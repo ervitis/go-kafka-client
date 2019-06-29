@@ -1,4 +1,4 @@
-version: "3.5"
+version: "2"
 services:
 
   kafka:
@@ -13,13 +13,6 @@ services:
       - "3030:3030"
     domainname: localhost
     hostname: localhost
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: on-failure
     environment:
       - SAMPLEDATA=0
       - RUNNING_SAMPLEDATA=0
