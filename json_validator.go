@@ -34,14 +34,11 @@ func (jv *JsonValidator) ValidateData(msg []byte, schema schema) (bool, error) {
 }
 
 func (jv *JsonValidator) IsReachable(schema schema) bool {
-	resp, err := http.Get(fmt.Sprintf("%s/%s.%s", os.Getenv("SCHEMA_HOST"), schema.Value, schema.Version))
+	resp, err := http.Get(fmt.Sprintf("%s/%s.%s.json", os.Getenv("SCHEMA_HOST"), schema.Value, schema.Version))
 	if err != nil {
-		print(err)
+		fmt.Println(err)
 		return false
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return false
-	}
-	return true
+	return resp.StatusCode == http.StatusOK
 }

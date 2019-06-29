@@ -1,6 +1,13 @@
 package gokafkaclient
 
-import "testing"
+import (
+	"io/ioutil"
+	"net"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
+)
 
 var msg = []byte(`{"name": "test", "version": "1.0.0"}`)
 
@@ -42,5 +49,63 @@ func TestJsonValidator_ValidateDataErrorLoadingSchema(t *testing.T) {
 	_, err := v.ValidateData(msg, schema)
 	if err == nil {
 		t.Error("error should not be empty")
+	}
+}
+
+func startServer(port string, code int) *httptest.Server {
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, _ := ioutil.ReadFile("./test_data/goodjson.1.0.0.json")
+
+		w.WriteHeader(code)
+		_, _ = w.Write(b)
+	}))
+
+	l, _ := net.Listen("tcp", ":" + port)
+	server.Listener = l
+
+	return server
+}
+
+func TestJsonValidator_IsReachable(t *testing.T) {
+	server := startServer("8800", http.StatusOK)
+	server.Start()
+	defer server.Close()
+	os.Setenv("SCHEMA_HOST", "http://localhost:8800")
+
+	schema := schema{Value: "goodjson", Version: "1.0.0"}
+
+	v := &JsonValidator{}
+
+	if !v.IsReachable(schema) {
+		t.Error("schema should be reachable")
+	}
+}
+
+func TestJsonValidator_IsNotReachable(t *testing.T) {
+	server := startServer("8800", http.StatusOK)
+	server.Start()
+	defer server.Close()
+	os.Setenv("SCHEMA_HOST", "http://localhost:8806")
+
+	schema := schema{Value: "goodjson", Version: "1.0.0"}
+
+	v := &JsonValidator{}
+
+	if v.IsReachable(schema) {
+		t.Error("schema should not be reachable")
+	}
+}
+
+func TestJsonValidator_IsNotReachable404(t *testing.T) {
+	server := startServer("8800", http.StatusNotFound)
+	server.Start()
+	defer server.Close()
+	os.Setenv("SCHEMA_HOST", "http://localhost:8800")
+	schema := schema{Value: "goodson", Version: "1.1.0"}
+
+	v := &JsonValidator{}
+
+	if v.IsReachable(schema) {
+		t.Error("schema should not be reachable and return 404")
 	}
 }
