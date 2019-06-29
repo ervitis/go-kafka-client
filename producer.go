@@ -60,7 +60,7 @@ func (p *producerClient) Produce(ev []byte, headers ...ProducerHeader) error {
 		hs = append(hs, h)
 	}
 
-	event, err := p.p.send(ev, hs...)
+	event, err := p.p.send(p.kp, p.t, ev, hs...)
 	if err != nil {
 		return err
 	}
@@ -72,12 +72,12 @@ func (p *producerClient) Produce(ev []byte, headers ...ProducerHeader) error {
 	return nil
 }
 
-func (p *producerClient) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+func (p *producer) send(kc *kafka.Producer, tp *kafka.TopicPartition, ev []byte, headers ...kafka.Header) (kafka.Event, error) {
 	devent := make(chan kafka.Event)
 
 	defer close(devent)
 
-	if err := p.kp.Produce(&kafka.Message{Headers: headers, TopicPartition: *p.t, Value: ev}, devent); err != nil {
+	if err := kc.Produce(&kafka.Message{Headers: headers, TopicPartition: *tp, Value: ev}, devent); err != nil {
 		return nil, err
 	}
 

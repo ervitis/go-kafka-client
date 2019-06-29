@@ -94,6 +94,10 @@ func (kc *KafkaClient) BuildProducer() (*producerClient, error) {
 		return nil, fmt.Errorf(topicError, "producer", "topic name is empty")
 	}
 
+	if kc.pc.p == nil {
+		kc.pc.p = &producer{}
+	}
+
 	var err error
 
 	if kc.pc.kp, err = kafka.NewProducer(&kc.pc.config); err != nil {

@@ -14,17 +14,17 @@ type (
 	mockTopicProducerError struct{}
 )
 
-func (m *mockProducer) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+func (m *mockProducer) send(kc *kafka.Producer, tp *kafka.TopicPartition, ev []byte, headers ...kafka.Header) (kafka.Event, error) {
 	mevent := &kafka.Message{}
 	return mevent, nil
 }
 
-func (m *mockBadProducer) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+func (m *mockBadProducer) send(kc *kafka.Producer, tp *kafka.TopicPartition, ev []byte, headers ...kafka.Header) (kafka.Event, error) {
 	mevent := &kafka.Message{}
 	return mevent, errors.New("ups")
 }
 
-func (m *mockTopicProducerError) send(ev []byte, headers ...kafka.Header) (kafka.Event, error) {
+func (m *mockTopicProducerError) send(kc *kafka.Producer, tp *kafka.TopicPartition, ev []byte, headers ...kafka.Header) (kafka.Event, error) {
 	mevent := &kafka.Message{
 		TopicPartition: kafka.TopicPartition{Error: errors.New("ups")},
 	}

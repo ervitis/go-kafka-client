@@ -7,12 +7,14 @@ import (
 
 type (
 	kafkaProducer interface {
-		send(ev []byte, headers ...kafka.Header) (kafka.Event, error)
+		send(kc *kafka.Producer, tp *kafka.TopicPartition, ev []byte, headers ...kafka.Header) (kafka.Event, error)
 	}
 
 	kafkaConsumer interface {
 		receive(t time.Duration) (*kafka.Message, error)
 	}
+
+	producer struct{}
 
 	producerClient struct {
 		config            kafka.ConfigMap
