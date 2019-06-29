@@ -77,8 +77,15 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 		default:
 			msg, err := c.receive(time.Duration(c.pollTimeoutSeconds) * time.Second)
 			if err != nil {
-				errHandler(nil, err)
-				return
+				switch erv := err.(type) {
+				case *kafka.Error:
+					if erv.IsFatal() {
+						panic(err)
+					}
+				default:
+					errHandler(nil, err)
+					return
+				}
 			}
 
 			if c.validateOnConsume {

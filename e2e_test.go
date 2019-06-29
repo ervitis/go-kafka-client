@@ -2,8 +2,8 @@ package gokafkaclient
 
 import (
 	"strconv"
+	"sync"
 	"testing"
-	"time"
 )
 
 func producerConfig() map[string]interface{} {
@@ -23,9 +23,11 @@ func consumerConfig() map[string]interface{} {
 
 func TestE2E(t *testing.T) {
 	count := 0
+	wg := sync.WaitGroup{}
 
 	handler := func(msg []byte) {
 		count++
+		wg.Done()
 	}
 
 	errorHandler := func(msg []byte, err error) {}
@@ -45,6 +47,7 @@ func TestE2E(t *testing.T) {
 	consumer.DeactivateValidator()
 	producer.DeactivateValidator()
 
+	wg.Add(5)
 	go func() {
 		consumer.Consume("test-e2e", handler, errorHandler)
 	}()
@@ -55,7 +58,7 @@ func TestE2E(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(30 * time.Second)
+	wg.Wait()
 
 	if count != 5 {
 		t.Error("test e2e not worked")
