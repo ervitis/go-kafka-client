@@ -49,9 +49,11 @@ func TestE2E(t *testing.T) {
 		consumer.Consume("test-e2e", handler, errorHandler)
 	}()
 
-	for i := 0; i < 5; i++ {
-		go producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
-	}
+	go func() {
+		for i := 0; i < 5; i++ {
+			_ = producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
+		}
+	}()
 
 	time.Sleep(30 * time.Second)
 
