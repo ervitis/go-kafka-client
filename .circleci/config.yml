@@ -34,16 +34,10 @@ jobs:
       - setup_remote_docker
 
       - run:
-          name: build kafka image
-          command: docker-compose up -d --build && sleep 20
-
-      - run:
-          name: unit testing
-          command: make test
-
-      - run:
-          name: coverage
+          name: build kafka image and run tests and coverage
           command: |
+            docker-compose up -d --build && sleep 20
+            make test
             make cover
       - store_artifacts:
           path: $TEST_RESULTS
