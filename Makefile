@@ -1,5 +1,5 @@
 test:
-	go test -v -race ./...
+	go test -race -v ./...
 
 lint:
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
