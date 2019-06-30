@@ -18,12 +18,12 @@ jobs:
             - go-mod-{{ checksum "go.sum" }}
 
       - run:
-          name: golint
-          command: make lint
-
-      - run:
           name: dependencies
           command: bash dependencies.sh
+
+      - run:
+          name: golint
+          command: make lint
 
       - run:
           name: install docker compose
