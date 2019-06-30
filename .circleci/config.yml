@@ -1,0 +1,48 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+
+    parallelism: 2
+
+    environment:
+      TEST_RESULTS: /tmp/test-results
+
+    steps:
+      - checkout
+      - run: mkdir -p $TEST_RESULTS
+
+      - restore_cache:
+          keys:
+            - go-mod-{{ checksum "go.sum" }}
+
+      - run:
+          name: golint
+          command: make lint
+
+      - run:
+          name: dependencies
+          command: bash dependencies.sh
+
+      - run:
+          name: install docker compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - run:
+          name: build kafka image
+          command: docker-compose up -d --build && sleep 20
+
+      - run:
+          name: unit testing
+          command: make test
+
+      - run:
+          name: coverage
+          command: |
+            make cover
+      - store_artifacts:
+          path: $TEST_RESULTS
