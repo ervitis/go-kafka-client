@@ -25,6 +25,8 @@ jobs:
           name: golint
           command: make lint
 
+      - setup_remote_docker
+
       - run:
           name: install docker compose
           command: |
