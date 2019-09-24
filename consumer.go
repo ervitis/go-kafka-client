@@ -27,6 +27,13 @@ func (c *consumerClient) DeactivateValidator() *consumerClient {
 }
 
 /**
+ValidateMessageWithSchema if you want to validate the schema with the event data in []byte
+ */
+func (c *consumerClient) ValidateMessageWithSchema(data []byte, schema schema) bool {
+	return c.dataIsValidFromSchema(data, schema)
+}
+
+/**
 Set a schema to validate for the topic
  */
 func (c *consumerClient) SetSchema(topic, schemaName, version string) *consumerClient {
