@@ -2,7 +2,7 @@ package gokafkaclient
 
 import (
 	"errors"
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"testing"
 )
 

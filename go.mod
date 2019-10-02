@@ -3,8 +3,8 @@ module github.com/ervitis/go-kafka-client
 go 1.12
 
 require (
+	github.com/confluentinc/confluent-kafka-go v1.1.0
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	github.com/xeipuuv/gojsonschema v1.1.0 // indirect
-	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.0.0 // indirect
+	github.com/xeipuuv/gojsonschema v1.1.0
 )

@@ -23,6 +23,7 @@ func consumerConfig() map[string]interface{} {
 
 func TestE2E(t *testing.T) {
 	count := 0
+
 	wg := sync.WaitGroup{}
 
 	handler := func(msg []byte) {
@@ -47,20 +48,23 @@ func TestE2E(t *testing.T) {
 	consumer.DeactivateValidator()
 	producer.DeactivateValidator()
 
-	wg.Add(5)
-	go func() {
-		consumer.Consume("test-e2e", handler, errorHandler)
-	}()
-
+	wg.Add(1)
 	go func() {
 		for i := 0; i < 5; i++ {
 			_ = producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
 		}
+		wg.Done()
 	}()
 
 	wg.Wait()
 
-	if count != 5 {
+	wg.Add(6)
+	go func() {
+		consumer.Consume("test-e2e", handler, errorHandler)
+	}()
+
+	wg.Wait()
+	if count != 6 {
 		t.Error("test e2e not worked")
 	}
 }
