@@ -1,6 +1,6 @@
-module github.com/ervitis/go-kafka-client
+module go-kafka-client/v2
 
-go 1.12
+go 1.13
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.1.0

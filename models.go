@@ -34,6 +34,10 @@ type (
 		validateOnConsume  bool
 		validator          Validator
 		schemas            map[string]schema
+		topic              string
+		handler            ConsumerHandler
+		errHandler         ConsumerErrorHandler
+		conditions         []ConsumerConditions
 	}
 
 	/**

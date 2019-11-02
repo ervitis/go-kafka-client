@@ -2,10 +2,12 @@ package gokafkaclient
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -58,21 +60,26 @@ func (c *consumerClient) dataIsValidFromSchema(ev []byte, sch schema) bool {
 }
 
 /**
+Subscribe to a topic parsing its handler and error handler and conditions
+ */
+func (c *consumerClient) Subscribe(topic string, handler ConsumerHandler, errHandler ConsumerErrorHandler, conditions ...ConsumerConditions) error {
+	c.handler = handler
+	c.errHandler = errHandler
+	c.conditions = conditions
+
+	if strings.TrimSpace(topic) == "" {
+		return errors.New("cannot subscribe to empty topic")
+	}
+	c.topic = topic
+
+	return c.kc.Subscribe(topic, nil)
+}
+
+/**
 Consumer for the messages of the topic. When a message is read it will be filtered by the conditions and then the
 handler will be called
  */
-func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandler ConsumerErrorHandler, conditions ...ConsumerConditions) {
-	if topic == "" {
-		err := fmt.Errorf(topicError, "consumer", "no topics to subscribe")
-		errHandler(nil, err)
-		return
-	}
-
-	if err := c.kc.Subscribe(topic, nil); err != nil {
-		errHandler(nil, err)
-		return
-	}
-
+func (c *consumerClient) Consume() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
@@ -80,35 +87,35 @@ func (c *consumerClient) Consume(topic string, handler ConsumerHandler, errHandl
 		select {
 		case sig := <-sigchan:
 			err := fmt.Errorf(signalError, sig)
-			errHandler(nil, err)
+			c.errHandler(nil, err)
 		default:
-			msg, err := c.receive(time.Duration(c.pollTimeoutSeconds) * time.Second)
+			msg, err := c.readMessage(time.Duration(c.pollTimeoutSeconds) * time.Second)
 			if err != nil {
 				switch erv := err.(type) {
 				case *kafka.Error:
 					if erv.IsFatal() {
-						panic(err)
+						c.errHandler(nil, err)
 					}
 				default:
-					errHandler(nil, err)
+					c.errHandler(nil, err)
 					return
 				}
 			}
 
 			if c.validateOnConsume {
-				if !c.dataIsValidFromSchema(msg.Value, c.schemas[topic]) {
-					err := fmt.Errorf(schemaNotValidError, c.schemas[topic].Value, c.schemas[topic].Version, string(msg.Value))
-					errHandler(msg.Value, err)
+				if !c.dataIsValidFromSchema(msg.Value, c.schemas[c.topic]) {
+					err := fmt.Errorf(schemaNotValidError, c.schemas[c.topic].Value, c.schemas[c.topic].Version, string(msg.Value))
+					c.errHandler(msg.Value, err)
 					return
 				}
 			}
 
-			c.filterEvent(msg.Value, handler, conditions)
+			c.filterEvent(msg.Value, c.handler, c.conditions)
 		}
 	}
 }
 
-func (c *consumerClient) receive(t time.Duration) (*kafka.Message, error) {
+func (c *consumerClient) readMessage(t time.Duration) (*kafka.Message, error) {
 	return c.kc.ReadMessage(t)
 }
 
