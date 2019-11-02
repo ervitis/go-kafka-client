@@ -157,17 +157,11 @@ func TestConsumerClient_Consume_Errors(t *testing.T) {
 		kc:        &kafka.Consumer{},
 	}
 
-	hasError := false
-
 	handler := func(msg []byte) {}
 
-	errorHandler := func(msg []byte, err error) {
-		hasError = true
-	}
+	errorHandler := func(msg []byte, err error) {}
 
-	c.Consume("", handler, errorHandler)
-
-	if !hasError {
+	if err := c.Subscribe("", handler, errorHandler); err == nil {
 		t.Error("there should be an error because topic was empty on consumer")
 	}
 }

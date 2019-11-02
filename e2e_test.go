@@ -60,7 +60,8 @@ func TestE2E(t *testing.T) {
 
 	wg.Add(6)
 	go func() {
-		consumer.Consume("test-e2e", handler, errorHandler)
+		consumer.Subscribe("test-e2e", handler, errorHandler)
+		consumer.Consume()
 	}()
 
 	wg.Wait()

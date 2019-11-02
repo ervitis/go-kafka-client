@@ -34,5 +34,6 @@ func main() {
 
 	topic := "testing.simple"
 
-	c.Consume(topic, handler, errorHandler)
+	c.Subscribe(topic, handler, errorHandler)
+	c.Consume()
 }
