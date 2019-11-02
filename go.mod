@@ -1,4 +1,4 @@
-module go-kafka-client/v2
+module github.com/ervitis/go-kafka-client
 
 go 1.13
 
