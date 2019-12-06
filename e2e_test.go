@@ -64,10 +64,11 @@ func TestE2E(t *testing.T) {
 		_ = producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
 	}
 
-	if err = consumer.Subscribe("test-e2e", handler, errorHandler); err != nil {
-		panic(err)
-	}
-	go consumer.Consume()
+	go func() {
+		if err = consumer.Subscribe("test-e2e", handler, errorHandler); err != nil {
+			panic(err)
+		}
+	}()
 
 	wg.Add(N)
 	wg.Wait()

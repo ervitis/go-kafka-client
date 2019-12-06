@@ -72,14 +72,18 @@ func (c *consumerClient) Subscribe(topic string, handler ConsumerHandler, errHan
 	}
 	c.topic = topic
 
-	return c.kc.Subscribe(topic, nil)
+	if err := c.kc.Subscribe(topic, nil); err != nil {
+		return err
+	}
+	c.consume()
+	return nil
 }
 
 /**
 Consumer for the messages of the topic. When a message is read it will be filtered by the conditions and then the
 handler will be called
  */
-func (c *consumerClient) Consume() {
+func (c *consumerClient) consume() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 

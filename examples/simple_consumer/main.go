@@ -8,7 +8,7 @@ import (
 func consumerConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"group.id":           "test.simple-client",
-		"auto.offset.reset":  "earliest",
+		"auto.offset.reset":  "latest",
 		"session.timeout.ms": 10000,
 		"bootstrap.servers":  "localhost:9092",
 	}
@@ -35,5 +35,4 @@ func main() {
 	topic := "testing.simple"
 
 	c.Subscribe(topic, handler, errorHandler)
-	c.Consume()
 }
