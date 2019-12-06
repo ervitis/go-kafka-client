@@ -89,7 +89,7 @@ func handlerError(msg []byte, err error) { fmt.Println(err) }
 
 conditions := []ConsumerConditions{ {Key: "EventType", Value: "create-user"} }
 
-consumer.Consume("topic", handlerEvent, handlerError, conditions)
+consumer.Subscribe("topic", handlerEvent, handlerError, conditions)
 ```
 
 ### Prerequisites
