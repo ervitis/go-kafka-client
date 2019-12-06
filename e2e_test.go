@@ -1,6 +1,7 @@
 package gokafkaclient
 
 import (
+	"fmt"
 	"strconv"
 	"sync"
 	"testing"
@@ -9,24 +10,35 @@ import (
 func producerConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"bootstrap.servers": "localhost:9092",
+		"acks":              -1,
 	}
 }
 
 func consumerConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"group.id":           "test.simple-client",
-		"auto.offset.reset":  "earliest",
-		"session.timeout.ms": 10000,
-		"bootstrap.servers":  "localhost:9092",
+		"group.id":             "test.simple-client",
+		"auto.offset.reset":    "earliest",
+		"session.timeout.ms":   10000,
+		"bootstrap.servers":    "localhost:9092",
 	}
 }
 
 var count = 0
 var wg sync.WaitGroup
+var mtx sync.Mutex
+
+const N = 5
 
 var handler = func(msg []byte) {
-	count++
-	wg.Done()
+	mtx.Lock()
+	defer mtx.Unlock()
+
+	if count < 5 {
+		fmt.Println("Before " + strconv.Itoa(count))
+		count++
+		fmt.Println("After " + strconv.Itoa(count))
+		wg.Done()
+	}
 }
 
 var errorHandler = func(msg []byte, err error) {}
@@ -48,20 +60,15 @@ func TestE2E(t *testing.T) {
 	consumer.DeactivateValidator()
 	producer.DeactivateValidator()
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < N; i++ {
 		_ = producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
 	}
 
-	wg.Wait()
-
-	wg.Add(5)
-	go func() {
-		_ = consumer.Subscribe("test-e2e", handler, errorHandler)
-		consumer.Consume()
-	}()
-
-	wg.Wait()
-	if count != 5 {
-		t.Error("test e2e not worked")
+	if err = consumer.Subscribe("test-e2e", handler, errorHandler); err != nil {
+		panic(err)
 	}
+	go consumer.Consume()
+
+	wg.Add(N)
+	wg.Wait()
 }
