@@ -21,17 +21,17 @@ func consumerConfig() map[string]interface{} {
 	}
 }
 
+var count = 0
+var wg sync.WaitGroup
+
+var handler = func(msg []byte) {
+	count++
+	wg.Done()
+}
+
+var errorHandler = func(msg []byte, err error) {}
+
 func TestE2E(t *testing.T) {
-	count := 0
-
-	wg := sync.WaitGroup{}
-
-	handler := func(msg []byte) {
-		count++
-		wg.Done()
-	}
-
-	errorHandler := func(msg []byte, err error) {}
 
 	client := NewKafkaClient()
 
@@ -48,24 +48,20 @@ func TestE2E(t *testing.T) {
 	consumer.DeactivateValidator()
 	producer.DeactivateValidator()
 
-	wg.Add(1)
-	go func() {
-		for i := 0; i < 5; i++ {
-			_ = producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
-		}
-		wg.Done()
-	}()
+	for i := 0; i < 5; i++ {
+		_ = producer.Produce([]byte(`hello test ` + strconv.Itoa(i)))
+	}
 
 	wg.Wait()
 
-	wg.Add(6)
+	wg.Add(5)
 	go func() {
 		_ = consumer.Subscribe("test-e2e", handler, errorHandler)
 		consumer.Consume()
 	}()
 
 	wg.Wait()
-	if count != 6 {
+	if count != 5 {
 		t.Error("test e2e not worked")
 	}
 }
