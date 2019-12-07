@@ -88,6 +88,22 @@ func TestConsumerClient_DataIsValidFromSchema_NotValid(t *testing.T) {
 	}
 }
 
+func TestConsumerClient_ActivateCommitMessage(t *testing.T) {
+	c := consumerClient{}
+
+	if c.ActivateCommitMessage(); !c.commitOnMessage {
+		t.Errorf("commitOnMessage should be activated")
+	}
+}
+
+func TestConsumerClient_DeactivateCommitMessage(t *testing.T) {
+	c := consumerClient{}
+
+	if c.DeactivateCommitMessage(); c.commitOnMessage {
+		t.Errorf("commitOnMessage should be deactivated")
+	}
+}
+
 func TestConsumerClient_filterEvent(t *testing.T) {
 	c := consumerClient{}
 

@@ -29,6 +29,22 @@ func (c *consumerClient) DeactivateValidator() *consumerClient {
 }
 
 /**
+Sets commitOnMessage to true so it will call CommitMessage function
+ */
+func (c *consumerClient) ActivateCommitMessage() *consumerClient {
+	c.commitOnMessage = true
+	return c
+}
+
+/**
+
+ */
+func (c *consumerClient) DeactivateCommitMessage() *consumerClient {
+	c.commitOnMessage = false
+	return c
+}
+
+/**
 ValidateMessageWithSchema if you want to validate the schema with the event data in []byte
  */
 func (c *consumerClient) ValidateMessageWithSchema(data []byte, schema schema) bool {
@@ -80,6 +96,16 @@ func (c *consumerClient) Subscribe(topic string, handler ConsumerHandler, errHan
 }
 
 /**
+Commit offset, not use if auto commit is set to true
+ */
+func (c *consumerClient) Commit() error {
+	if _, err := c.kc.Commit(); err != nil {
+		return err
+	}
+	return nil
+}
+
+/**
 Consumer for the messages of the topic. When a message is read it will be filtered by the conditions and then the
 handler will be called
  */
@@ -114,7 +140,12 @@ func (c *consumerClient) consume() {
 				}
 			}
 
+			c.mtx.Lock()
 			c.filterEvent(msg.Value, c.handler, c.conditions)
+			if c.commitOnMessage {
+				c.kc.CommitMessage(msg)
+			}
+			c.mtx.Unlock()
 		}
 	}
 }

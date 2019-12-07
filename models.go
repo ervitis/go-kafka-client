@@ -2,6 +2,7 @@ package gokafkaclient
 
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"sync"
 	"time"
 )
 
@@ -30,6 +31,8 @@ type (
 		config             kafka.ConfigMap
 		c                  kafkaConsumer
 		kc                 *kafka.Consumer
+		mtx                sync.Mutex
+		commitOnMessage    bool
 		pollTimeoutSeconds int
 		validateOnConsume  bool
 		validator          Validator
