@@ -94,7 +94,7 @@ consumer.Subscribe("topic", handlerEvent, handlerError, conditions)
 
 ### Prerequisites
 
-This library is using confluent kafka go client version 1.0.0 and librdkafka 1.0.1 version
+This library is using confluent kafka go client version 1.1.0 and librdkafka 1.3.0 version
 
 ```bash
 git clone -b v1.0.1 https://github.com/edenhill/librdkafka
