@@ -2,10 +2,10 @@
 
 Kafka Golang library using confluent golang library and librdkafka
 
-[![Build Status](https://travis-ci.org/ervitis/go-kafka-client.svg?branch=master)](https://travis-ci.org/ervitis/go-kafka-client) 
+![lint](https://github.com/ervitis/go-kafka-client/workflows/lint/badge.svg)
+![acceptance](https://github.com/ervitis/go-kafka-client/workflows/acceptance/badge.svg)
 [![codecov](https://codecov.io/gh/ervitis/go-kafka-client/branch/master/graph/badge.svg)](https://codecov.io/gh/ervitis/go-kafka-client) 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ervitis/go-kafka-client)](https://goreportcard.com/report/github.com/ervitis/go-kafka-client) 
-[![CircleCI](https://circleci.com/gh/ervitis/go-kafka-client/tree/master.svg?style=svg)](https://circleci.com/gh/ervitis/go-kafka-client/tree/master) 
 [![Coverage Status](https://coveralls.io/repos/github/ervitis/go-kafka-client/badge.svg?branch=master)](https://coveralls.io/github/ervitis/go-kafka-client?branch=master)
 
 ## Getting Started

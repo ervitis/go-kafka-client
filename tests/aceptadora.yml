@@ -1,0 +1,17 @@
+services:
+  zookeeper:
+    image: docker.io/confluentinc/cp-zookeeper:6.0.1
+    ports:
+      - "2181:2181"
+    ignore_logs: true
+    env_file:
+      - ${YAMLDIR}/.env_zookeeper
+
+  broker:
+    image: docker.io/confluentinc/cp-server:6.0.1
+    ignore_logs: true
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    env_file:
+      - ${YAMLDIR}/.env_broker1
