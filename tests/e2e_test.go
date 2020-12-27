@@ -55,17 +55,7 @@ func (tk *TestKafka) SetupTest() {
 	tk.aceptadora = aceptadora.New(tk.T(), imagePuller, tk.config.Aceptadora)
 	tk.aceptadora.PullImages(ctx)
 
-	tk.aceptadora.Run(ctx, "zookeeper")
-	tk.Require().Eventually(func() bool {
-		ping, err := net.Dial("tcp", "localhost:2181")
-		if err != nil {
-			return false
-		}
-		_ = ping.Close()
-		return true
-	}, time.Minute, 3 * time.Second, "zookeeper not started")
-
-	tk.aceptadora.Run(ctx, "broker")
+	tk.aceptadora.Run(ctx, "kafka")
 	tk.Require().Eventually(func() bool {
 		ping, err := net.Dial("tcp", "localhost:9092")
 		if err != nil {

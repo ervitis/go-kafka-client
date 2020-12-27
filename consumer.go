@@ -143,7 +143,9 @@ func (c *consumerClient) consume() {
 			c.mtx.Lock()
 			c.filterEvent(msg.Value, c.handler, c.conditions)
 			if c.commitOnMessage {
-				c.kc.CommitMessage(msg)
+				if _, err := c.kc.CommitMessage(msg); err != nil {
+					c.errHandler(msg.Value, err)
+				}
 			}
 			c.mtx.Unlock()
 		}

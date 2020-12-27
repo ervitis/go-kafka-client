@@ -1,17 +1,13 @@
 services:
-  zookeeper:
-    image: docker.io/confluentinc/cp-zookeeper:6.0.1
-    ports:
-      - "2181:2181"
-    ignore_logs: true
-    env_file:
-      - ${YAMLDIR}/.env_zookeeper
-
-  broker:
-    image: docker.io/confluentinc/cp-server:6.0.1
-    ignore_logs: true
+  kafka:
+    image: docker.io/lensesio/fast-data-dev:2.3.0
     ports:
       - "9092:9092"
-      - "9101:9101"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "2181:2181"
+      - "3030:3030"
+    ignore_logs: true
     env_file:
-      - ${YAMLDIR}/.env_broker1
+      - ${YAMLDIR}/.env_kafka

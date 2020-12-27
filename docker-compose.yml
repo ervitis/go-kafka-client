@@ -2,7 +2,7 @@ version: "2"
 services:
 
   kafka:
-    image: landoop/fast-data-dev:latest
+    image: lensesio/fast-data-dev:2.3.0
     container_name: kafka
     ports:
       - "9092:9092"
